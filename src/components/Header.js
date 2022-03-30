@@ -2,7 +2,7 @@ import React from "react";
 import css from "./Header.module.css";
 import publicURL from "../utils/public";
 
-export default function Header() {
+export default () => {
   return (
     <div className={css.row}>
       <div className={css.header_elem}>
@@ -16,4 +16,4 @@ export default function Header() {
       </div>
     </div>
   );
-}
+};
