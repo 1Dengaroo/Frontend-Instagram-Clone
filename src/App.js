@@ -6,38 +6,38 @@ import Profile from "./components/Profile";
 import Explore from "./components/Explore";
 import Activity from "./components/Activity";
 import NewPost from "./components/NewPost";
-import React from "react";
-import data from "./utils/initialStore";
+import React, { useState } from "react";
+import initialStore from "./utils/initialStore";
+import uniqueId from "./utils/uniqueId.js";
 
-export default class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      page: "home",
-      ...data,
-    };
-    this.setPage = this.setPage.bind(this);
-    this.addLike = this.addLike.bind(this);
-    this.removeLike = this.removeLike.bind(this);
-  }
+// To update github pages:
+// run "git push origin master" in terminal
 
-  setPage(page) {
-    this.setState({ page: page });
-  }
+export default () => {
+  const [page, setPage] = useState("home");
+  const [currentUserId, setCurrentUserId] = useState(
+    initialStore.currentUserId
+  );
+  const [users, setUsers] = useState(initialStore.users);
+  const [posts, setPosts] = useState(initialStore.posts);
+  const [followers, setFollowers] = useState(initialStore.followers);
+  const [comments, setComments] = useState(initialStore.comments);
+  const [likes, setLikes] = useState(initialStore.likes);
 
-  renderMain(page) {
+  function renderMain(page) {
     switch (page) {
       case "home":
         console.log("render home");
         return (
           <Home
-            currentUserId={this.state.currentUserId}
-            posts={this.state.posts}
-            users={this.state.users}
-            comments={this.state.comments}
-            likes={this.state.likes}
-            onLike={this.addLike}
-            onUnlike={this.removeLike}
+            currentUserId={currentUserId}
+            posts={posts}
+            users={users}
+            comments={comments}
+            likes={likes}
+            onLike={addLike}
+            onUnlike={removeLike}
+            onComment={addComment}
           />
         );
       case "explore":
@@ -45,7 +45,7 @@ export default class App extends React.Component {
         return <Explore />;
       case "newpost":
         console.log("render newpost");
-        return <NewPost />;
+        return <NewPost post={posts} onPost={addPost} onCancel={cancelPost} />;
       case "activity":
         console.log("render activity");
         return <Activity />;
@@ -53,61 +53,82 @@ export default class App extends React.Component {
         console.log("render profile");
         return (
           <Profile
-            currentUserId={this.state.currentUserId}
-            followers={this.state.followers}
-            posts={this.state.posts}
-            users={this.state.users}
+            currentUserId={currentUserId}
+            followers={followers}
+            posts={posts}
+            users={users}
           />
         );
       default:
         console.log("render default");
         return (
           <Home
-            currentUserId={this.state.currentUserId}
-            posts={this.state.posts}
-            users={this.state.users}
-            comments={this.state.comments}
-            likes={this.state.likes}
-            onLike={this.addLike}
+            currentUserId={currentUserId}
+            posts={posts}
+            users={users}
+            comments={comments}
+            likes={likes}
+            onLike={addLike}
+            onComment={addComment}
           />
         );
     }
   }
-
-  addLike(postId) {
+  function addLike(postId) {
     const like = {
-      userId: this.state.currentUserId,
+      userId: currentUserId,
       postId,
       datetime: new Date().toISOString(),
     };
 
-    this.setState({
-      likes: this.state.likes.concat(like),
-    });
+    setLikes(likes.concat(like));
   }
 
-  removeLike(postId) {
+  function removeLike(postId) {
     const like = {
-      userId: this.state.currentUserId,
+      userId: currentUserId,
       postId,
       datetime: new Date().toISOString(),
     };
 
-    this.setState({
-      likes: this.state.likes.filter(
-        (like) =>
-          !(like.userId === this.state.currentUserId && like.postId === postId)
-      ),
-    });
-  }
-
-  render() {
-    return (
-      <div className="container">
-        <Header />
-        <main className="content">{this.renderMain(this.state.page)}</main>
-        <Navbar onNavChange={this.setPage} />
-      </div>
+    setLikes(
+      likes.filter(
+        (like) => !(like.userId === currentUserId && like.postId === postId)
+      )
     );
   }
-}
+
+  function addComment(postId, text) {
+    const comment = {
+      userId: currentUserId,
+      postId,
+      text,
+      datetime: new Date().toISOString(),
+    };
+    setComments(comments.concat(comment));
+  }
+
+  function addPost(photo, desc) {
+    const post = {
+      id: uniqueId("post"),
+      userId: currentUserId,
+      photo,
+      desc,
+      datetime: new Date().toISOString(),
+    };
+    setPosts(posts.concat(post));
+    setPage("home");
+  }
+
+  function cancelPost() {
+    setPage("home");
+  }
+
+  return (
+    <div className="container">
+      <Header />
+      <main className="content">{renderMain(page)}</main>
+      <Navbar onNavChange={setPage} />
+    </div>
+  );
+};

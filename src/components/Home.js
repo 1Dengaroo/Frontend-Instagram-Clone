@@ -34,6 +34,7 @@ export default (props) => {
             likes={findLikes(post, likes)}
             onLike={props.onLike}
             onUnlike={props.onUnlike}
+            onComment={props.onComment}
           />
         ))}
     </div>

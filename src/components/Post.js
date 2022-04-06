@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import css from "./Post.module.css";
 import timespan from "../utils/timespan";
 import publicURL from "../utils/public";
@@ -6,6 +6,8 @@ import publicURL from "../utils/public";
 export default (props) => {
   const { comments, likes, post, user } = props;
   const likePath = likes.self ? "/assets/unlike.svg" : "/assets/like.svg";
+  const [comment, setComment] = useState("");
+  const [toggleComment, setToggleComment] = useState(false); // hidden initially
 
   function handleLike() {
     props.onLike(props.post.id);
@@ -13,6 +15,13 @@ export default (props) => {
 
   function handleUnlike() {
     props.onUnlike(props.post.id);
+  }
+
+  function handleSubmitComment(event) {
+    props.onComment(props.post.id, comment); // this calls addComment from App.js
+    setComment(""); //reset
+    setToggleComment(false); //close comment box
+    event.preventDefault(); // prevent page refresh
   }
 
   return (
@@ -30,7 +39,9 @@ export default (props) => {
         <button onClick={likes.self ? handleUnlike : handleLike}>
           <img src={publicURL(likePath)} alt="Like"></img>
         </button>
-        <img src={publicURL("/assets/comment.svg")} alt="Comment"></img>
+        <button onClick={(e) => setToggleComment(!toggleComment)}>
+          <img src={publicURL("/assets/comment.svg")} alt="Comment"></img>
+        </button>
         <div className={css.likes}>
           <strong>{likes.count} likes</strong>
         </div>
@@ -51,6 +62,17 @@ export default (props) => {
       <div className={css.date}>
         {timespan(post.datetime).toUpperCase()} AGO
       </div>
+      {toggleComment && (
+        <form className={css.addComment} onSubmit={handleSubmitComment}>
+          <input
+            type="text"
+            placeholder="Add a comment…"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          />
+          <button type="submit">Post</button>
+        </form>
+      )}
     </div>
   );
 };

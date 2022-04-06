@@ -1,3 +1,4 @@
 export default (path) => {
-  return process.env.PUBLIC_URL + path;
+  const publicURL = path.startsWith("data:image") ? "" : process.env.PUBLIC_URL;
+  return publicURL + path;
 };
