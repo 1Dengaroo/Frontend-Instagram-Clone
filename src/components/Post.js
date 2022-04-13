@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import css from "./Post.module.css";
 import timespan from "../utils/timespan";
 import publicURL from "../utils/public";
+import { Link } from "react-router-dom";
 
 export default (props) => {
   const { comments, likes, post, user } = props;
@@ -28,9 +29,11 @@ export default (props) => {
     <div className={css.post_container}>
       <div className={css.user}>
         <img className={css.image} src={publicURL(user.photo)}></img>
-        <div className={css.user_id}>
-          <strong>{user.id}</strong>
-        </div>
+        <Link to={`/profile/${user.id}`}>
+          <div className={css.user_id}>
+            <strong>{user.id}</strong>
+          </div>
+        </Link>
       </div>
       <div className={css.post}>
         <img src={publicURL(post.photo)}></img>
@@ -48,13 +51,18 @@ export default (props) => {
       </div>
       <div className={css.comment_div}>
         <div className={css.desc}>
-          <strong>{post.userId} </strong>
+          <Link to={`/profile/${user.id}`}>
+            <strong>{post.userId} </strong>
+          </Link>
           {post.desc}
         </div>
         {comments.map((com) => {
           return (
             <div className={css.comment}>
-              <strong>{com.userId}</strong> {com.text}
+              <Link to={`/profile/${com.userId}`}>
+                <strong>{com.userId}</strong>
+              </Link>{" "}
+              {com.text}
             </div>
           );
         })}

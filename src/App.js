@@ -9,6 +9,7 @@ import NewPost from "./components/NewPost";
 import React, { useState } from "react";
 import initialStore from "./utils/initialStore";
 import uniqueId from "./utils/uniqueId.js";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 // To update github pages:
 // run "git push origin master" in terminal
@@ -24,56 +25,6 @@ export default () => {
   const [comments, setComments] = useState(initialStore.comments);
   const [likes, setLikes] = useState(initialStore.likes);
 
-  function renderMain(page) {
-    switch (page) {
-      case "home":
-        console.log("render home");
-        return (
-          <Home
-            currentUserId={currentUserId}
-            posts={posts}
-            users={users}
-            comments={comments}
-            likes={likes}
-            onLike={addLike}
-            onUnlike={removeLike}
-            onComment={addComment}
-          />
-        );
-      case "explore":
-        console.log("render explore");
-        return <Explore />;
-      case "newpost":
-        console.log("render newpost");
-        return <NewPost post={posts} onPost={addPost} onCancel={cancelPost} />;
-      case "activity":
-        console.log("render activity");
-        return <Activity />;
-      case "profile":
-        console.log("render profile");
-        return (
-          <Profile
-            currentUserId={currentUserId}
-            followers={followers}
-            posts={posts}
-            users={users}
-          />
-        );
-      default:
-        console.log("render default");
-        return (
-          <Home
-            currentUserId={currentUserId}
-            posts={posts}
-            users={users}
-            comments={comments}
-            likes={likes}
-            onLike={addLike}
-            onComment={addComment}
-          />
-        );
-    }
-  }
   function addLike(postId) {
     const like = {
       userId: currentUserId,
@@ -120,15 +71,88 @@ export default () => {
     setPage("home");
   }
 
-  function cancelPost() {
-    setPage("home");
+  function addFollower(userId, followerId) {
+    const follower = {
+      userId,
+      followerId,
+    };
+    setFollowers(followers.concat(follower));
   }
 
+  function removeFollower(userId, followerId) {
+    const follower = {
+      userId,
+      followerId,
+    };
+    setFollowers(
+      followers.filter(
+        (fol) =>
+          !(
+            fol.userId === follower.userId &&
+            fol.followerId === follower.followerId
+          )
+      )
+    );
+  }
   return (
-    <div className="container">
-      <Header />
-      <main className="content">{renderMain(page)}</main>
-      <Navbar onNavChange={setPage} />
-    </div>
+    <Router basename={process.env.PUBLIC_URL}>
+      <div className="container">
+        <Header />
+        <main className="content">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <Home
+                  currentUserId={currentUserId}
+                  posts={posts}
+                  users={users}
+                  comments={comments}
+                  likes={likes}
+                  onLike={addLike}
+                  onUnlike={removeLike}
+                  onComment={addComment}
+                />
+              }
+            ></Route>
+            <Route
+              path=":postId"
+              element={
+                <Home
+                  currentUserId={currentUserId}
+                  posts={posts}
+                  users={users}
+                  comments={comments}
+                  likes={likes}
+                  onLike={addLike}
+                  onUnlike={removeLike}
+                  onComment={addComment}
+                />
+              }
+            ></Route>
+            <Route
+              path="/profile/:userId"
+              element={
+                <Profile
+                  currentUserId={currentUserId}
+                  followers={followers}
+                  posts={posts}
+                  users={users}
+                  onFollow={addFollower}
+                  onUnfollow={removeFollower}
+                />
+              }
+            ></Route>
+            <Route
+              path="newpost"
+              element={<NewPost post={posts} onPost={addPost} />}
+            ></Route>
+            <Route path="activity" element={<Activity />}></Route>
+            <Route path="explore" element={<Explore />}></Route>
+          </Routes>
+        </main>
+        <Navbar userId={initialStore.currentUserId} />
+      </div>
+    </Router>
   );
 };

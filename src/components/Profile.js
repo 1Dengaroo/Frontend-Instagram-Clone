@@ -1,17 +1,31 @@
 import React from "react";
 import css from "./Profile.module.css";
 import publicURL from "../utils/public";
-
+import { Link, useParams } from "react-router-dom";
 export default (props) => {
+  const { userId } = useParams();
   const { currentUserId, posts, users, followers } = props;
-  const [user] = users.filter((user) => user.id === currentUserId);
-  const user_posts = posts.filter((post) => post.userId === currentUserId);
+  const [user] = users.filter((user) => user.id === userId);
+  const user_posts = posts.filter((post) => post.userId === userId);
   const user_followers = followers.filter(
-    (follower) => follower.userId === currentUserId
+    (follower) => follower.userId === userId
   );
   const user_follows = followers.filter(
-    (follower) => follower.followerId === currentUserId
+    (follower) => follower.followerId === userId
   );
+  const follows =
+    user_followers.filter((follower) => follower.followerId === currentUserId)
+      .length > 0
+      ? true
+      : false;
+
+  function handleFollow() {
+    props.onFollow(userId, currentUserId);
+  }
+
+  function handleUnfollow() {
+    props.onUnfollow(userId, currentUserId);
+  }
 
   return (
     <div className={css.profile_container}>
@@ -19,7 +33,18 @@ export default (props) => {
         <div className={css.pfp_container}>
           <img src={publicURL(user.photo)}></img>
         </div>
-        <div className={css.name}>{user.id}</div>
+        <div>
+          <div className={css.name}>
+            {user.id}
+            <br />
+          </div>
+          <button
+            onClick={!follows ? handleFollow : handleUnfollow}
+            className={!follows ? css.followBtn : css.unfollowBtn}
+          >
+            {follows ? "Unfollow" : "Follow"}
+          </button>
+        </div>
       </div>
       <div className={css.bio}>
         <div>
@@ -45,15 +70,17 @@ export default (props) => {
       <div className={css.pictures}>
         {user_posts.map((post) => {
           return (
-            <div className={css.square}>
-              <div className={css.content}>
-                <img
-                  className={css.image}
-                  src={publicURL(post.photo)}
-                  alt="Post Thumbnail"
-                />
+            <Link key={post.id} to={`/${post.id}`}>
+              <div className={css.square}>
+                <div className={css.content}>
+                  <img
+                    className={css.image}
+                    src={publicURL(post.photo)}
+                    alt="Post Thumbnail"
+                  />
+                </div>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>

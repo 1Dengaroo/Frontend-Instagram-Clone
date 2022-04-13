@@ -1,10 +1,11 @@
 import React from "react";
+import { useParams } from "react-router-dom";
 import css from "./Home.module.css";
 import Post from "./Post";
 
 export default (props) => {
   const { posts, users, likes, comments, currentUserId } = props;
-
+  const { postId } = useParams();
   function findUser(post, users) {
     return users.find((user) => user.id === post.userId);
   }
@@ -24,6 +25,10 @@ export default (props) => {
   return (
     <div className={css.home}>
       {posts
+        .filter((post) => {
+          if (postId === undefined) return post;
+          else return post.id === postId;
+        })
         .sort((a, b) => new Date(b.datetime) - new Date(a.datetime))
         .map((post) => (
           <Post
