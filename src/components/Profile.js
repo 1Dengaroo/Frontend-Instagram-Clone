@@ -1,10 +1,19 @@
-import React from "react";
+import React, { useContext } from "react";
 import css from "./Profile.module.css";
 import publicURL from "../utils/public";
 import { Link, useParams } from "react-router-dom";
+import { StoreContext } from "../contexts/StoreContext";
+
 export default (props) => {
   const { userId } = useParams();
-  const { currentUserId, posts, users, followers } = props;
+  const {
+    users,
+    posts,
+    followers,
+    currentUserId,
+    addFollower,
+    removeFollower,
+  } = useContext(StoreContext);
   const [user] = users.filter((user) => user.id === userId);
   const user_posts = posts.filter((post) => post.userId === userId);
   const user_followers = followers.filter(
@@ -20,11 +29,11 @@ export default (props) => {
       : false;
 
   function handleFollow() {
-    props.onFollow(userId, currentUserId);
+    addFollower(userId, currentUserId);
   }
 
   function handleUnfollow() {
-    props.onUnfollow(userId, currentUserId);
+    removeFollower(userId, currentUserId);
   }
 
   return (

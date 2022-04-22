@@ -13,6 +13,7 @@
 
   border-bottom: 1px solid #dbdbdb;
   background-color: #fff;
+  z-index: 1;
 }
 
 .header_elem {

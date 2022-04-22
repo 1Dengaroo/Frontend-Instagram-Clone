@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import css from "./Navbar.module.css";
 import publicURL from "../utils/public";
 import { Link } from "react-router-dom";
+import { StoreContext } from "../contexts/StoreContext";
 
 export default (props) => {
-  const currentUserId = props.userId;
+  const { currentUserId } = useContext(StoreContext);
   return (
     <nav className={css.row}>
       <div className={css.nav_elem}>

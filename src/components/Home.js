@@ -1,10 +1,20 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useParams } from "react-router-dom";
 import css from "./Home.module.css";
 import Post from "./Post";
-
-export default (props) => {
-  const { posts, users, likes, comments, currentUserId } = props;
+import { StoreContext } from "../contexts/StoreContext";
+export default function Home(props) {
+  let {
+    posts,
+    users,
+    likes,
+    comments,
+    currentUserId,
+    addComment,
+    addLike,
+    removeLike,
+  } = useContext(StoreContext);
+  
   const { postId } = useParams();
   function findUser(post, users) {
     return users.find((user) => user.id === post.userId);
@@ -37,11 +47,11 @@ export default (props) => {
             post={post}
             comments={findComments(post, comments)}
             likes={findLikes(post, likes)}
-            onLike={props.onLike}
-            onUnlike={props.onUnlike}
-            onComment={props.onComment}
+            onLike={addLike}
+            onUnlike={removeLike}
+            onComment={addComment}
           />
         ))}
     </div>
   );
-};
+}

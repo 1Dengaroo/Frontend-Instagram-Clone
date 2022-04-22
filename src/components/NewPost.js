@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import css from "./NewPost.module.css";
 import FileLoader from "./FileLoader.js";
 import { useNavigate } from "react-router-dom";
+import { StoreContext } from "../contexts/StoreContext";
 
-function NewPost(props) {
+export default function NewPost(props) {
   const [dragging, setDragging] = useState(false); // to show a dragging effect
   const [desc, setDesc] = useState("");
   const [photo, setPhoto] = useState(null);
   const [error, setError] = useState(""); // to show an error message
   const navigate = useNavigate();
+  const { addPost } = useContext(StoreContext);
 
   function handleFileDragEnter(e) {
     setDragging(true);
@@ -48,7 +50,7 @@ function NewPost(props) {
     if (photo == null) {
       setError("You need to add a photo!");
     } else {
-      props.onPost(photo, desc);
+      addPost(photo, desc);
       setError("");
       navigate(-1);
     }
@@ -92,5 +94,3 @@ function NewPost(props) {
     </div>
   );
 }
-
-export default NewPost;
